@@ -1,9 +1,12 @@
-
+# tippy.js 源码阅读
+> tippy 通过 popperjs V2 实现了弹出提示等功能
+>
+> tippy.js 源码地址: https://atomiks.github.io/tippyjs/
 
 入口文件 
 ```javascript
     build\bundle-umd.js
-  ```
+```
 初始化 tippy
 
 返回接口实例
@@ -29,20 +32,20 @@
     unmount,
     destroy,
   };
-  ```
+```
 静态方法
 ```javascript
     tippy.createSingleton = createSingleton;    // 创建单例  外接函数, 用于创建多个不用的实例
     tippy.delegate = delegate;                  // 事件委派, 用户 通过父元素, 为子元素创建实例
     tippy.hideAll = hideAll;                    // 隐藏全部
     tippy.roundArrow = ROUND_ARROW;
-  ```
+```
 静态属性
 ```javascript
 tippy.defaultProps = defaultProps;
 tippy.setDefaultProps = setDefaultProps;   // 传入的选项， 替换默认中的选项， 
 tippy.currentInput = currentInput;         // 当前输入(触发)元素
-  ```
+```
 index.js
 ```javascript
 function tippy(
@@ -55,7 +58,7 @@ function tippy(
     const elements = getArrayOfElements(targets);
     createTippy(reference, passedProps);
 }
-  ```
+```
 createTippy.ts
 ```javascript
 function createTippy(
@@ -92,7 +95,7 @@ function createTippy(
         debouncedOnMouseMove(event);
     });
 }
-  ```
+```
 template.ts
 ```javascript
 function render(
@@ -128,7 +131,7 @@ function render(
         onUpdate,
     };
 }
-  ```
+```
 createTippy.ts
 应该去显示
 可能因为要隐藏, 会取消显示
@@ -154,7 +157,7 @@ function scheduleShow(event?: Event): void {
       instance.show();
     }
 }
-  ```
+```
 显示
 显示前的准备工作
 ```javascript
@@ -190,7 +193,7 @@ function show(): void {
     mount();
 
 }
-  ```
+```
 
 ```javascript
  function mount(): void {
@@ -228,7 +231,7 @@ function createPopperInstance(): void {
     // 创建实例
     instance.popperInstance = createPopper<ExtendedModifiers>(...);
 }
- ```
+```
 销毁Popper实例
 ```javascript
   function destroyPopperInstance(): void {
@@ -241,7 +244,7 @@ function createPopperInstance(): void {
   }
 ```
 
- // 应该去隐藏
+ 应该去隐藏
  可能因为显示, 取消隐藏
  ```javascript
 function scheduleHide(event: Event): void {
@@ -274,8 +277,8 @@ function scheduleHide(event: Event): void {
     }
 
 }
-  ```
-// 隐藏
+ ```
+隐藏
 隐藏的准备工作
 ```javascript
   function hide(): void {
@@ -291,8 +294,8 @@ function scheduleHide(event: Event): void {
         onTransitionedOut(duration, instance.unmount);
 
   }
-  ```
-  // 取消挂载
+```
+ 取消挂载
   ```javascript
   function unmount(): void {
        // 销毁popper 实例
@@ -304,9 +307,9 @@ function scheduleHide(event: Event): void {
     instance.state.isMounted = false;
 
   }
-```
+  ```
 
-================================
+
 事件监听触发的操作
 ================================
 
@@ -391,8 +394,8 @@ focusout blur  触发关闭
   }
 ```
 
- // pop上有交互,
-  // 鼠标离开, 要隐藏
+pop上有交互,
+鼠标离开, 要隐藏
   debouncedOnMouseMove 延时触发移动方法 onMouseMove
   ```javascript
   function hideWithInteractivity(event: MouseEvent): void {
@@ -402,13 +405,13 @@ focusout blur  触发关闭
     // mouseLeave
     debouncedOnMouseMove(event);
   }
-```
+  ```
 
- // 鼠标移动
-  // 有交互的情况
-  // 不能解决 有空隙的快速切换滑入问题
-  // 如果鼠标在popper 或者 触发目标上, 则 不作为
-  // 否则, 移除doc上的监听 且 应该隐藏
+鼠标移动
+有交互的情况
+不能解决 有空隙的快速切换滑入问题
+如果鼠标在popper 或者 触发目标上, 则 不作为
+ 否则, 移除doc上的监听 且 应该隐藏
    ```javascript
   function onMouseMove(event: MouseEvent): void {
 
@@ -430,107 +433,4 @@ focusout blur  触发关闭
     }
   }
 
-Learn-code-tippyjs-V6.2.6
-
-// 闭包的应用
-// 防抖机制
-//--------------------
-function debounce(fn , ms){
-
-  var timeout = null;
-
-  return function(arg) {
-    clearTimeout(timeout);
-
-    timeout = setTimeout(function(){
-      fn(arg);
-
-    }, ms);
-  }
-}
-// 使用方法 和 测试
-//--------------------
-function log(arg){
-  console.log(arg);
-}
-// 初始化闭包函数
-var debounceLog = debounce(log, 200);
-
-// 这三个一起调用, 只能输出最后一个
-debounceLog(1)
-debounceLog(2)
-debounceLog(3)
-
-// 一个一个调用, 每次都输出
-setInterval(function(){
-  debounceLog(5)
-},300)
-
-
-}
-  ```
-```javascript
-
-function debounce(fn , ms){
-  //  ======================
-  // 从这里
-
-
-  // 这个变量相当于debounceLog函数的全局变量
-  var timeout = null;
-
-
-
-  // 到这里 
-  //  只有调用var debounceLog = debounce(log, 200);
-  //  的时候执行了一次 
-  // ============================
-
-
-  // debounceLog(1) 调用这个函数的时候, 
-  // 只调用下面的, 上面的不调用
-
-  return function(arg) {
-    clearTimeout(timeout);
-
-    timeout = setTimeout(function(){
-      fn(arg);
-
-    }, ms);
-  }
-}
-
-
-var fn = function (arg){
-  console.log(arg);
-}
-var ms = 200;
-var timeout = null;
-
-var debounceLog = function(arg) {
-    clearTimeout(timeout);
-
-    timeout = setTimeout(function(){
-      fn(arg);
-
-    }, ms);
-}
-
-
-    var timeout = setTimeout(function(){
-      console.log(1);
-    }, 200);
-
-    clearTimeout(timeout);
-
-    const uuid = (function () {
-        let id = 0;
-        return function (str) {
-            str = str || '';
-            id++;
-            return str + id
-        }
-
-    })();
-
-```
+   ```
