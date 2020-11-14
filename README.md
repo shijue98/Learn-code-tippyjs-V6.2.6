@@ -86,6 +86,7 @@ function createTippy(
     popper.addEventListener('mouseenter', () => {
         instance.clearDelayTimeouts();
     });
+      
     // 有mouseenter触发方式, 且 与popper 可交互的情况下,鼠标离开popper, 
     // 如果鼠标在popper 或者 触发目标上, 则 不作为
     // 否则, 移除doc上的监听 且 应该隐藏 scheduleHide()
@@ -96,7 +97,10 @@ function createTippy(
     });
 }
 ```
+
+
 template.ts
+
 ```javascript
 function render(
   instance: Instance
@@ -310,6 +314,7 @@ function scheduleHide(event: Event): void {
   ```
 
 
+
 事件监听触发的操作
 ================================
 
@@ -396,7 +401,7 @@ focusout blur  触发关闭
 
 pop上有交互,
 鼠标离开, 要隐藏
-  debouncedOnMouseMove 延时触发移动方法 onMouseMove
+ debouncedOnMouseMove 延时触发移动方法 onMouseMove
   ```javascript
   function hideWithInteractivity(event: MouseEvent): void {
 
